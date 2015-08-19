@@ -1,0 +1,15 @@
+diff -Nru libffi-3.2.1/debian/rules libffi-3.2.1/debian/rules
+--- libffi-3.2.1/debian/rules	2014-06-04 13:28:42.000000000 +0000
++++ libffi-3.2.1/debian/rules	2015-05-26 02:19:36.000000000 +0000
+@@ -45,7 +45,10 @@
+ 		--prefix=/usr \
+ 		--mandir=\$${prefix}/share/man \
+ 		--infodir=\$${prefix}/share/info \
+-		CC="$(CC)" CXX="$(CXX)" CFLAGS="$(CFLAGS)" CCASFLAGS="$(CFLAGS) -Wa,--gdwarf2" LDFLAGS="-Wl,-z,defs $(LDFLAGS)"
++		CC="$(CC)" CXX="$(CXX)" CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs $(LDFLAGS)" \
++# clang doesn't accept --gdwarf2, it should be -gdwarf-2
++		if [ `${CC} --version | grep -c "clang version"` -eq 1 ]; then CCASFLAGS="$(CFLAGS) -Wa,-gdwarf-2"; \
++		else CCASFLAGS="$(CFLAGS) -Wa,--gdwarf2"; fi
+ 	touch $@
+ #		--libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
+ 

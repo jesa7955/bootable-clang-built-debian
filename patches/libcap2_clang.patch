@@ -1,0 +1,9 @@
+diff -Nru libcap2-2.24/debian/libcap2.symbols libcap2-2.24/debian/libcap2.symbols
+--- libcap2-2.24/debian/libcap2.symbols	2015-06-07 16:41:18.000000000 +0000
++++ libcap2-2.24/debian/libcap2.symbols	2015-08-07 09:08:18.000000000 +0000
+@@ -1,4 +1,5 @@
+ libcap.so.2 libcap2 #MINVER#
++ __cap_lookup_name@Base 1:2.24-9
+  _cap_names@Base 1:2.10
+  _libcap_strdup@Base 1:2.10
+  cap_clear@Base 1:2.10

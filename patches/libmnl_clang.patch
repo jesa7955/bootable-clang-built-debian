@@ -1,0 +1,15 @@
+diff -Nru libmnl-1.0.3/debian/rules libmnl-1.0.3/debian/rules
+--- libmnl-1.0.3/debian/rules	2014-08-03 23:00:32.000000000 -0400
++++ libmnl-1.0.3/debian/rules	2015-08-11 21:32:49.000000000 -0400
+@@ -9,6 +9,11 @@
+ 
+ CFLAGS += -fstack-protector-all
+ 
++# clang doesnt like the visibility definitions in this code
++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
++CFLAGS += -fvisibility=default 
++endif
++
+ %:
+ 	dh $@ -- --with autoreconf
+ 

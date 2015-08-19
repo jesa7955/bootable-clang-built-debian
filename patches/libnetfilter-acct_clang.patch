@@ -1,0 +1,14 @@
+diff -Nru libnetfilter-acct-1.0.2/debian/rules libnetfilter-acct-1.0.2/debian/rules
+--- libnetfilter-acct-1.0.2/debian/rules	2014-09-10 11:10:01.000000000 +0000
++++ libnetfilter-acct-1.0.2/debian/rules	2015-06-21 05:43:00.000000000 +0000
+@@ -1,5 +1,9 @@
+ #!/usr/bin/make -f
+ 
+# clang doesnt like the visibility definitions in this code
++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
++export CFLAGS += -fvisibility=default
++endif
++
+ %:
+ 	dh $@ --with autoreconf 
+ 

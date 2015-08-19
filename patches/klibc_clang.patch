@@ -1,0 +1,27 @@
+diff -Nru klibc-2.0.4/debian/patches/clang_build.patch klibc-2.0.4/debian/patches/clang_build.patch
+--- klibc-2.0.4/debian/patches/clang_build.patch	1970-01-01 00:00:00.000000000 +0000
++++ klibc-2.0.4/debian/patches/clang_build.patch	2015-06-21 05:55:30.000000000 +0000
+@@ -0,0 +1,15 @@
++--- a/scripts/Kbuild.klibc
+++++ b/scripts/Kbuild.klibc
++@@ -118,6 +118,12 @@
++ 		       -I$(KLIBCKERNELOBJ)/include -I$(srctree)/include)    \
++ 		     $(KLIBCARCHINCFLAGS)
++ 
+++# when building with clang, clang's builtin header files's location is not in the search path.
+++ifeq ($(shell $(KLIBCCC) --version | grep -c "clang version"),1)
+++      CLANGVERSION    := $(shell $(KLIBCCC) --version | grep "clang version" | sed "s/.*version \([0-9]*\.[0-9]*\).*/\1/")
+++      KLIBCCPPFLAGS   += -I/usr/include/clang/$(CLANGVERSION)/include
+++endif
+++
++ # klibc definitions
++ KLIBCDEFS        += -D__KLIBC__=$(KLIBCMAJOR)          \
++ 		    -D__KLIBC_MINOR__=$(KLIBCMINOR)    \
+diff -Nru klibc-2.0.4/debian/patches/series klibc-2.0.4/debian/patches/series
+--- klibc-2.0.4/debian/patches/series	2014-10-05 00:13:46.000000000 +0000
++++ klibc-2.0.4/debian/patches/series	2015-06-21 05:38:47.000000000 +0000
+@@ -9,3 +9,4 @@
+ readlink-add-f-option.patch
+ mount-implement-o-defaults.patch
+ mips-update-archfcntl-h.patch
++clang_build.patch

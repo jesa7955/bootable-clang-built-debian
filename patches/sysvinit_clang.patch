@@ -1,0 +1,35 @@
+diff -Nru sysvinit-2.88dsf/debian/patches/clang_build.patch sysvinit-2.88dsf/debian/patches/clang_build.patch
+--- sysvinit-2.88dsf/debian/patches/clang_build.patch	1970-01-01 00:00:00.000000000 +0000
++++ sysvinit-2.88dsf/debian/patches/clang_build.patch	2015-05-24 14:45:55.000000000 +0000
+@@ -0,0 +1,23 @@
++--- a/src/Makefile
+++++ b/src/Makefile
++@@ -98,9 +98,9 @@
++ init:		LDLIBS += $(INITLIBS) $(STATIC)
++ init:		init.o init_utmp.o
++ 
++-halt:		halt.o ifdown.o hddown.o utmp.o reboot.h
+++halt:		halt.o ifdown.o hddown.o utmp.o
++ 
++-last:		last.o oldutmp.h
+++last:		last.o
++ 
++ mesg:		mesg.o
++ 
++@@ -115,7 +115,7 @@
++ 
++ wall:		dowall.o wall.o
++ 
++-shutdown:	dowall.o shutdown.o utmp.o reboot.h
+++shutdown:	dowall.o shutdown.o utmp.o
++ 
++ bootlogd:	LDLIBS += -lutil
++ bootlogd:	bootlogd.o
+diff -Nru sysvinit-2.88dsf/debian/patches/series sysvinit-2.88dsf/debian/patches/series
+--- sysvinit-2.88dsf/debian/patches/series	2015-05-20 05:54:32.000000000 +0000
++++ sysvinit-2.88dsf/debian/patches/series	2015-05-24 14:44:43.000000000 +0000
+@@ -15,3 +15,4 @@
+ 94_kfreebsd_xterm.patch
+ 95_kfreebsd_bootlogd.patch
+ 96_allow_multiple_console_output.patch
++clang_build.patch

@@ -1,0 +1,46 @@
+diff -Nru db5.3-5.3.28/debian/patches/clang_build.patch db5.3-5.3.28/debian/patches/clang_build.patch
+--- db5.3-5.3.28/debian/patches/clang_build.patch	1970-01-01 00:00:00.000000000 +0000
++++ db5.3-5.3.28/debian/patches/clang_build.patch	2015-08-08 11:39:12.000000000 +0000
+@@ -0,0 +1,20 @@
++--- a/src/dbinc/atomic.h
+++++ b/src/dbinc/atomic.h
++@@ -144,7 +144,7 @@
++ #define	atomic_inc(env, p)	__atomic_inc(p)
++ #define	atomic_dec(env, p)	__atomic_dec(p)
++ #define	atomic_compare_exchange(env, p, o, n)	\
++-	__atomic_compare_exchange((p), (o), (n))
+++	__atomic_compare_exchange_db((p), (o), (n))
++ static inline int __atomic_inc(db_atomic_t *p)
++ {
++ 	int	temp;
++@@ -176,7 +176,7 @@
++  * http://gcc.gnu.org/onlinedocs/gcc-4.1.0/gcc/Atomic-Builtins.html
++  * which configure could be changed to use.
++  */
++-static inline int __atomic_compare_exchange(
+++static inline int __atomic_compare_exchange_db(
++ 	db_atomic_t *p, atomic_value_t oldval, atomic_value_t newval)
++ {
++ 	atomic_value_t was;
+diff -Nru db5.3-5.3.28/debian/patches/series db5.3-5.3.28/debian/patches/series
+--- db5.3-5.3.28/debian/patches/series	2014-12-31 07:57:45.000000000 +0000
++++ db5.3-5.3.28/debian/patches/series	2015-08-08 11:39:12.000000000 +0000
+@@ -6,3 +6,4 @@
+ 007-link-sql-libs.patch
+ mmap_extend-mode-requires-page-aligned-extends.patch
+ 008-autoconf-in-lang-sql-sqlite.patch
++clang_build.patch
+diff -Nru db5.3-5.3.28/debian/rules db5.3-5.3.28/debian/rules
+--- db5.3-5.3.28/debian/rules	2014-12-31 07:57:45.000000000 +0000
++++ db5.3-5.3.28/debian/rules	2015-08-08 11:39:12.000000000 +0000
+@@ -19,6 +19,10 @@
+ -include /usr/share/gcj/debian_defaults
+ -include /usr/share/javahelper/java-vars.mk
+ 
++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
++DEB_BUILD_OPTIONS += nocheck
++endif
++
+ JAVA_BROKEN_ARCHS = m68k
+ GCJ_BROKEN_ARCHS = 
+ GCJ_NATIVE_ARCHS = $(filter-out $(GCJ_BROKEN_ARCHS), $(gcj_native_archs))

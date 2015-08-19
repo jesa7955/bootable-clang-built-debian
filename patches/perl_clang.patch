@@ -1,0 +1,14 @@
+diff -Nru perl-5.20.2/debian/rules perl-5.20.2/debian/rules
+--- perl-5.20.2/debian/rules	2015-05-13 18:49:14.000000000 +0000
++++ perl-5.20.2/debian/rules	2015-08-08 09:45:53.000000000 +0000
+@@ -70,6 +70,10 @@
+ export BZIP2_INCLUDE=/usr/include
+ export BZIP2_LIB=/usr/lib
+ 
++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
++DEB_BUILD_OPTIONS += nocheck
++endif
++
+ build: build-stamp
+ install: install-stamp
+ 

@@ -1,0 +1,12 @@
+diff -Nru glib2.0-2.44.1/debian/rules glib2.0-2.44.1/debian/rules
+--- glib2.0-2.44.1/debian/rules	2015-05-01 10:27:09.000000000 +0000
++++ glib2.0-2.44.1/debian/rules	2015-08-07 10:04:40.000000000 +0000
+@@ -82,6 +82,8 @@
+ 
+ # configure flags
+ DEB_CONFIGURE_EXTRA_FLAGS := \
++			CC=clang \
++			CXX=clang++ \
+ 			--with-html-dir=\$${prefix}/share/doc/$(DOC_PKG) \
+ 			--libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
+ 			--with-pcre=system

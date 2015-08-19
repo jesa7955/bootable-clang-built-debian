@@ -1,0 +1,24 @@
+diff -Nru busybox-1.22.0/debian/patches/clang_built.patch busybox-1.22.0/debian/patches/clang_built.patch
+--- busybox-1.22.0/debian/patches/clang_built.patch	1970-01-01 00:00:00.000000000 +0000
++++ busybox-1.22.0/debian/patches/clang_built.patch	2015-06-05 11:10:25.000000000 +0000
+@@ -0,0 +1,12 @@
++--- a/archival/libarchive/Kbuild.src
+++++ b/archival/libarchive/Kbuild.src
++@@ -45,6 +45,9 @@
++ lib-$(CONFIG_AR)                        += get_header_ar.o unpack_ar_archive.o
++ lib-$(CONFIG_CPIO)                      += get_header_cpio.o
++ lib-$(CONFIG_TAR)                       += get_header_tar.o
+++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
+++lib-$(CONFIG_TAR)                       += get_header_tar.o decompress_uncompress.o
+++endif
++ lib-$(CONFIG_FEATURE_TAR_TO_COMMAND)    += data_extract_to_command.o
++ lib-$(CONFIG_LZOP)                      += lzo1x_1.o lzo1x_1o.o lzo1x_d.o
++ lib-$(CONFIG_LZOP_COMPR_HIGH)           += lzo1x_9x.o
+diff -Nru busybox-1.22.0/debian/patches/series busybox-1.22.0/debian/patches/series
+--- busybox-1.22.0/debian/patches/series	2015-03-04 16:02:27.000000000 +0000
++++ busybox-1.22.0/debian/patches/series	2015-06-05 11:08:37.000000000 +0000
+@@ -29,3 +29,4 @@
+ update-deb-format-support.patch
+ 
+ CVE-2014-9645.patch
++clang_built.patch

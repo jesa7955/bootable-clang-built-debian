@@ -1,0 +1,14 @@
+--- systemd-224/debian/rules	2015-08-01 11:39:01.000000000 +0000
++++ systemd-224/debian/rules	2015-08-16 16:22:40.051909446 +0000
+@@ -86,6 +86,11 @@
+ 	--disable-seccomp \
+ 	--without-python
+ 
++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
++DEB_BUILD_OPTIONS += nocheck
++CONFFLAGS_deb += --disable-gnuefi
++endif
++
+ override_dh_auto_configure:
+ 	dh_auto_configure --builddirectory=build-deb \
+ 		-- $(CONFFLAGS) $(CONFFLAGS_deb)

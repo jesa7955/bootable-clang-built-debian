@@ -1,0 +1,31 @@
+diff -u mawk-1.3.3/debian/patches/series mawk-1.3.3/debian/patches/series
+--- mawk-1.3.3/debian/patches/series
++++ mawk-1.3.3/debian/patches/series
+@@ -1,3 +1,4 @@
++clang_build.patch
+ 01_error-on-full-fs
+ 02_fix-examples
+ 03_read-and-close-redefinition
+only in patch2:
+unchanged:
+--- mawk-1.3.3.orig/debian/patches/clang_build.patch
++++ mawk-1.3.3/debian/patches/clang_build.patch
+@@ -0,0 +1,18 @@
++--- a/print.c
+++++ b/print.c
++@@ -81,12 +81,15 @@
++    but we need them here and sometimes they are missing
++ */
++ 
+++#if __clang__ != 1
+++/* when build with clang, redeclaration of these prototyping will cause problem */
++ #ifdef NO_FPRINTF_IN_STDIO
++ int PROTO(fprintf, (FILE *, const char *,...)) ;
++ #endif
++ #ifdef NO_SPRINTF_IN_STDIO
++ int PROTO(sprintf, (char *, const char *,...)) ;
++ #endif
+++#endif
++ 
++ /* this can be moved and enlarged  by -W sprintf=num  */
++ char *sprintf_buff = string_buff ;

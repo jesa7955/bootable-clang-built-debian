@@ -1,0 +1,23 @@
+#!/bin/bash
+
+LINUX=`apt-cache search -t sid linux-image | grep "for 64-bit PCs$" | head -n1 | awk -F" - " '{print $1}'` 
+INCLUDE="--include=$LINUX,grub-pc,locales,ifupdown"
+VARIANT="--variant=minbase"
+BIN=`sudo debootstrap --print-debs $INCLUDE $VARIANT sid test` 
+for PKG in $BIN
+do
+	echo `apt-cache showsrc -t sid $PKG | head -n1 | awk -F": " '{print $2}'` >> tmp
+done
+
+cat tmp | sort -u | grep -v gcc-4\.* | grep -v "^linux$" > tmp2
+
+if [ -e $1 ]
+then
+	diff -Nru $1 tmp2 > list.diff
+	if [ $? -ne 0 ]
+	then
+		cp list.diff $JENKINS_HOME/userContent
+	fi
+fi
+mv tmp2 $1
+rm tmp list.diff || true

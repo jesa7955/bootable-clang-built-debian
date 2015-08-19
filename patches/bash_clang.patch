@@ -1,0 +1,14 @@
+diff -Nru bash-4.3/debian/rules bash-4.3/debian/rules
+--- bash-4.3/debian/rules	2015-01-28 16:55:12.000000000 +0000
++++ bash-4.3/debian/rules	2015-06-21 04:03:11.000000000 +0000
+@@ -44,6 +44,10 @@
+ CPPFLAGS := $(shell $(dpkg_buildflags) --get CPPFLAGS)
+ LDFLAGS := $(shell $(dpkg_buildflags) --get LDFLAGS)
+ 
++ifeq ($(shell $(CC) --version | grep -c "clang version"), 1)
++   LDFLAGS += -fuse-ld=gold
++endif
++
+ SHELL	= /bin/bash
+ YACC	= bison -y
+ 

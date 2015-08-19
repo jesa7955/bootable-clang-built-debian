@@ -1,0 +1,20 @@
+diff -Nru gnu-efi-3.0.2/debian/patches/clang_support.patch gnu-efi-3.0.2/debian/patches/clang_support.patch
+--- gnu-efi-3.0.2/debian/patches/clang_support.patch	1970-01-01 00:00:00.000000000 +0000
++++ gnu-efi-3.0.2/debian/patches/clang_support.patch	2015-08-06 08:22:40.000000000 +0000
+@@ -0,0 +1,11 @@
++--- a/inc/x86_64/efibind.h
+++++ b/inc/x86_64/efibind.h
++@@ -23,7 +23,7 @@
++ #endif
++ 
++ #if defined(GNU_EFI_USE_MS_ABI)
++-    #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7))
+++    #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)) || defined(__clang__)
++         #define HAVE_USE_MS_ABI 1
++     #else
++         #error Compiler is too old for GNU_EFI_USE_MS_ABI
+diff -Nru gnu-efi-3.0.2/debian/patches/series gnu-efi-3.0.2/debian/patches/series
+--- gnu-efi-3.0.2/debian/patches/series	2015-05-12 20:02:15.000000000 +0000
++++ gnu-efi-3.0.2/debian/patches/series	2015-08-06 08:21:18.000000000 +0000
+@@ -0,0 +1 @@
++clang_support.patch

@@ -1,0 +1,27 @@
+diff -Nru acl-2.2.52/debian/patches/clang_build.patch acl-2.2.52/debian/patches/clang_build.patch
+--- acl-2.2.52/debian/patches/clang_build.patch	1970-01-01 00:00:00.000000000 +0000
++++ acl-2.2.52/debian/patches/clang_build.patch	2015-08-10 11:43:32.000000000 +0000
+@@ -0,0 +1,15 @@
++--- a/include/builddefs.in
+++++ b/include/builddefs.in
++@@ -63,6 +63,12 @@
++ 
++ HAVE_ZIPPED_MANPAGES = @have_zipped_manpages@
++ 
+++# when building with clang, this two variables has some problems which make binary packages can't be installed correctly
+++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
+++PKG_LIB_DIR	:= $(subst gnu64,gnu,$(PKG_LIB_DIR))
+++PKG_DEVLIB_DIR	:= $(subst gnu64,gnu,$(PKG_DEVLIB_DIR))
+++endif
+++
++ ifneq "$(findstring $(PKG_PLATFORM), linux gnu gnu/kfreebsd gnu/knetbsd)" ""
++ PCFLAGS = -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
++ endif
+diff -Nru acl-2.2.52/debian/patches/series acl-2.2.52/debian/patches/series
+--- acl-2.2.52/debian/patches/series	2013-05-20 23:50:29.000000000 +0000
++++ acl-2.2.52/debian/patches/series	2015-08-10 11:41:43.000000000 +0000
+@@ -3,3 +3,4 @@
+ 10-590240-move-binaries-to-root-bin-dir.patch
+ 11-636512-fix-ftbfs4hurd.patch
+ 12-643588-acl-autoconf-version-check.patch
++clang_build.patch

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+PKG=$1
+URI=`apt-cache show $PKG | grep "Filename: " | cut -f 2 -d " "`
+wget http://http.debian.net/debian/$URI

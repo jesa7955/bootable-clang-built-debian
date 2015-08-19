@@ -1,0 +1,19 @@
+diff -Nru libsigc++-2.0-2.4.1/debian/libsigc++-2.0-0v5.symbols libsigc++-2.0-2.4.1/debian/libsigc++-2.0-0v5.symbols
+--- libsigc++-2.0-2.4.1/debian/libsigc++-2.0-0v5.symbols	2015-08-06 08:22:22.000000000 +0000
++++ libsigc++-2.0-2.4.1/debian/libsigc++-2.0-0v5.symbols	2015-08-08 10:47:42.000000000 +0000
+@@ -34,7 +34,7 @@
+  _ZN4sigc2_5E@Base 2.2.0
+  _ZN4sigc2_6E@Base 2.2.0
+  _ZN4sigc2_7E@Base 2.2.0
+- _ZN4sigc8internal11signal_impl16unreference_execEv@Base 2.4.0
++#MISSING: 2.4.1-2# _ZN4sigc8internal11signal_impl16unreference_execEv@Base 2.4.0
+  _ZN4sigc8internal11signal_impl5blockEb@Base 2.4.0
+  _ZN4sigc8internal11signal_impl5clearEv@Base 2.2.0
+  _ZN4sigc8internal11signal_impl5eraseESt14_List_iteratorINS_9slot_baseEE@Base 2.2.0
+@@ -86,4 +86,5 @@
+  _ZNK4sigc9trackable13callback_listEv@Base 2.2.0
+  _ZNK4sigc9trackable27add_destroy_notify_callbackEPvPFS1_S1_E@Base 2.2.0
+  _ZNK4sigc9trackable30remove_destroy_notify_callbackEPv@Base 2.2.0
+- (optional)_ZNSt7__cxx1110_List_baseIN4sigc9slot_baseESaIS2_EE8_M_clearEv@Base 2.2.0
++#MISSING: 2.4.1-2# (optional)_ZNSt7__cxx1110_List_baseIN4sigc9slot_baseESaIS2_EE8_M_clearEv@Base 2.2.0
++ _ZNSt7__cxx114listIN4sigc9slot_baseESaIS2_EE14_M_create_nodeERKS2_@Base 2.4.1-2

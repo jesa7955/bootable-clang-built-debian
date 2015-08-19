@@ -1,0 +1,25 @@
+diff -Nru audit-2.4.2/debian/patches/clang_build.patch audit-2.4.2/debian/patches/clang_build.patch
+--- audit-2.4.2/debian/patches/clang_build.patch	1970-01-01 00:00:00.000000000 +0000
++++ audit-2.4.2/debian/patches/clang_build.patch	2015-05-24 14:05:59.000000000 +0000
+@@ -0,0 +1,15 @@
++--- a/src/libev/ev.c
+++++ b/src/libev/ev.c
++@@ -967,7 +967,12 @@
++   #define ecb_unreachable() __builtin_unreachable ()
++ #else
++   /* this seems to work fine, but gcc always emits a warning for it :/ */
+++#  if __clang__
+++/* clang is using gnu11 as default, so _Noreturn must precede fuction declarator*/
+++  ecb_noreturn ecb_inline void ecb_unreachable (void);
+++#  else
++   ecb_inline void ecb_unreachable (void) ecb_noreturn;
+++#  endif
++   ecb_inline void ecb_unreachable (void) { }
++ #endif
++ 
+diff -Nru audit-2.4.2/debian/patches/series audit-2.4.2/debian/patches/series
+--- audit-2.4.2/debian/patches/series	2014-09-07 14:57:13.000000000 +0000
++++ audit-2.4.2/debian/patches/series	2015-05-24 14:03:21.000000000 +0000
+@@ -1 +1,2 @@
+ 01-no-refusemanualstop.patch
++clang_build.patch

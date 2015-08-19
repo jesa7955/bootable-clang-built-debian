@@ -1,0 +1,29 @@
+#!/bin/bash
+
+PKG_LIST=$JENKINS_HOME/userContent/package.list
+PKG_DIFF=$JENKINS_HOME/userContent/list.diff
+
+if [ `/usr/bin/jenkins-driver all-jobs | grep $JOB_NAME | grep -c notbuilt` -eq 1 ]
+then
+	LIST=`cat $PKG_LIST | grep -v acl`
+	for PKG in $LIST
+	do
+		/usr/bin/jenkins-driver create ${PKG}_clang_built
+	done
+else
+	if [ -e $PKG_LIST ]
+	then
+		DEL=`cat $PKG_DIFF | grep "^-" | tail -n +2`
+		ADD=`cat $PKG_DIFF | grep "^+" | tail -n +2`
+		for PKG in $DEL
+		do
+			sudo rm -r $JENKINS_HOME/jobs/${PKG}_clang_built
+			/usr/bin/jenkins-driver delete ${PKG}_clang_built
+		done
+
+		for PKG in $ADD
+		do
+			/usr/bin/jenkins-driver create ${PKG}_clang_built
+		done
+	fi
+fi

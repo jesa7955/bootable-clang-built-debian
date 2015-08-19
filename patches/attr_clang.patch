@@ -1,0 +1,27 @@
+diff -Nru attr-2.4.47/debian/patches/clang_build.patch attr-2.4.47/debian/patches/clang_build.patch
+--- attr-2.4.47/debian/patches/clang_build.patch	1970-01-01 00:00:00.000000000 +0000
++++ attr-2.4.47/debian/patches/clang_build.patch	2015-08-10 11:46:19.000000000 +0000
+@@ -0,0 +1,15 @@
++--- a/include/builddefs.in
+++++ b/include/builddefs.in
++@@ -75,6 +75,12 @@
++ 
++ HAVE_ZIPPED_MANPAGES = @have_zipped_manpages@
++ 
+++# when building with clang, this two variables has some problems which make binary packages can't be installed correctly
+++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
+++PKG_LIB_DIR	:= $(subst gnu64,gnu,$(PKG_LIB_DIR))
+++PKG_DEVLIB_DIR	:= $(subst gnu64,gnu,$(PKG_DEVLIB_DIR))
+++endif
+++
++ ifneq "$(findstring $(PKG_PLATFORM), linux gnu gnu/kfreebsd gnu/knetbsd)" ""
++ PCFLAGS = -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
++ endif
+diff -Nru attr-2.4.47/debian/patches/series attr-2.4.47/debian/patches/series
+--- attr-2.4.47/debian/patches/series	2013-05-20 11:51:52.000000000 +0000
++++ attr-2.4.47/debian/patches/series	2015-08-10 11:45:47.000000000 +0000
+@@ -1,3 +1,4 @@
+ 01-configure.in.patch
+ 02-687531-fix-missing-ldflags.patch
+ 12-643587-attr-autoconf-version-check.patch
++clang_build.patch

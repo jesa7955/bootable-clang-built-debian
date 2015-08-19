@@ -1,0 +1,49 @@
+diff -Nru grub2-2.02~beta2/debian/patches/clang-build.patch grub2-2.02~beta2/debian/patches/clang-build.patch
+--- grub2-2.02~beta2/debian/patches/clang-build.patch	1970-01-01 00:00:00.000000000 +0000
++++ grub2-2.02~beta2/debian/patches/clang-build.patch	2015-06-21 04:24:34.000000000 +0000
+@@ -0,0 +1,21 @@
++Index: grub2-2.02~beta2/grub-core/kern/i386/tsc.c
++===================================================================
++--- grub2-2.02~beta2.orig/grub-core/kern/i386/tsc.c	2013-12-24 16:29:27.000000000 +0000
+++++ grub2-2.02~beta2/grub-core/kern/i386/tsc.c	2015-05-26 15:31:27.196859750 +0000
++@@ -57,6 +57,8 @@
++   return (((grub_uint64_t) hi) << 32) | lo;
++ }
++ 
+++#ifndef GRUB_MACHINE_XEN
+++
++ static __inline int
++ grub_cpu_is_tsc_supported (void)
++ {
++@@ -68,6 +70,7 @@
++ 
++   return (d & (1 << 4)) != 0;
++ }
+++#endif
++ 
++ #ifndef GRUB_MACHINE_XEN
++ 
+diff -Nru grub2-2.02~beta2/debian/patches/series grub2-2.02~beta2/debian/patches/series
+--- grub2-2.02~beta2/debian/patches/series	2015-06-14 08:59:56.000000000 +0000
++++ grub2-2.02~beta2/debian/patches/series	2015-06-21 04:27:14.000000000 +0000
+@@ -72,3 +72,4 @@
+ fix_diskfilter_lv_name_dblfree.patch
+ fix_disk-module_option_handling.patch
+ ppc64el-avoid_unnecessary_optimizations.patch
++clang-build.patch
+diff -Nru grub2-2.02~beta2/debian/rules grub2-2.02~beta2/debian/rules
+--- grub2-2.02~beta2/debian/rules	2015-06-14 08:59:56.000000000 +0000
++++ grub2-2.02~beta2/debian/rules	2015-06-21 04:26:12.000000000 +0000
+@@ -30,6 +30,12 @@
+ 
+ CC := gcc-4.9
+ 
++# clang doesn't support -Wno-unused-but-set-varible, it will give out a waring(-unknow-warning-option). This will result error while building because of -Werror. So for now we should set these flags while building with clang.
++ifeq ($(shell $(CC) --version | grep -c "clang version"),1)
++	TARGET_CPPFLAGS += -Wno-error=unknown-warning-option
++	HOST_CFLAGS += -Wno-error=unknown-warning-option
++endif
++
+ confflags = PACKAGE_VERSION="$(deb_version)" PACKAGE_STRING="GRUB $(deb_version)" CC=$(CC) TARGET_CC=$(CC) --enable-grub-mkfont
+ substvars =
+ 

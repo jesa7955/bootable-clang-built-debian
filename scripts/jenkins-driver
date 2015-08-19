@@ -1,0 +1,31 @@
+#!/usr/bin/python2
+
+from autojenkins import Jenkins
+import sys
+
+command = sys.argv[1]
+if len(sys.argv) > 2:
+    job = sys.argv[2]
+if len(sys.argv) > 3:
+    status = sys.argv[3]
+
+instance = Jenkins('http://128.199.87.18:8080/', auth=('user', 'passwd'))
+if command == "all-jobs":
+    all_jobs = instance.all_jobs()
+    for job in all_jobs:
+        print job
+elif command == "last-result":
+    result = instance.last_result(job)
+    print result
+elif command == "create":
+    if not instance.job_exists(job):
+        instance.create_copy(job, 'acl_clang_built')
+elif command == "delete":
+    if instance.job_exists(job):
+        instance.delete(job)
+elif command == "build":
+    if status == "wait":
+        result = instance.build(job, wait=True)
+        print result
+    else:
+        instance.build(job)
