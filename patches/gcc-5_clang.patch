@@ -1,0 +1,13 @@
+--- gcc-5-5.2.1/debian/rules2	2015-08-19 15:23:44.584647553 +0800
++++ gcc-5-5.2.1/debian/rules2	2015-08-19 15:24:13.452745490 +0800
+@@ -179,7 +179,9 @@
+ 
+ docdir		= usr/share/doc
+ 
+-CONFARGS = -v \
++CONFARGS = CC=clang \
++	CXX=clang++ \
++	-v \
+ 	--with-pkgversion='$(distribution)$(if $(with_linaro_branch),/Linaro)___$(DEB_VERSION)' \
+ 	--with-bugurl='file:///usr/share/doc/$(subst gcj,gcc,$(PKGSOURCE))/README.Bugs'
+ 
