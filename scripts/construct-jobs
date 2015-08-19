@@ -11,7 +11,7 @@ then
 		/usr/bin/jenkins-driver create ${PKG}_clang_built
 	done
 else
-	if [ -e $PKG_LIST ]
+	if [ -e $PKG_DIFF ]
 	then
 		DEL=`cat $PKG_DIFF | grep "^-" | tail -n +2`
 		ADD=`cat $PKG_DIFF | grep "^+" | tail -n +2`

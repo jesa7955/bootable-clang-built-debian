@@ -27,8 +27,8 @@ do
 done < $PKG_LIST
 
 /usr/bin/jenkins-driver build llvmlinux wait
-JOBS=`/usr/bin/jenkins-all-jobs | grep -v start_clang_built | grep -c clang_built`
-SUCCEEDED=`/usr/bin/jenkins-all-jobs | grep -v start_clang_built | grep clang_built | grep -c blue`
+JOBS=`/usr/bin/jenkins-driver all-jobs | grep -v start_clang_built | grep -c clang_built`
+SUCCEEDED=`/usr/bin/jenkins-driver all-jobs | grep -v start_clang_built | grep clang_built | grep -c blue`
 if [ $JOBS -ne $SUCCEEDED ]
 then
 	exit 1

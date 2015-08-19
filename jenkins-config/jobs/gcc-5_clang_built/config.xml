@@ -19,12 +19,17 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>cd $JENKINS_HOME/packages
-rm gcc-5-base* libgcc1* libstdc++6*
-cd $WORKSPACE
-/usr/bin/gcc-built-download gcc-5-base
-/usr/bin/gcc-built-download libgcc1
-/usr/bin/gcc-built-download libstdc++6
+      <command>PKG=`echo $JOB_NAME | awk -F_ &apos;{print $1}&apos;`
+/usr/bin/clang-built $PKG special
+if [$? -ne 0 ]
+then
+	cd $JENKINS_HOME/packages
+	rm gcc-5-base* libgcc1* libstdc++6*
+	cd $WORKSPACE
+	/usr/bin/gcc-built-download gcc-5-base
+	/usr/bin/gcc-built-download libgcc1
+	/usr/bin/gcc-built-download libstdc++6
+fi
 cp *deb $JENKINS_HOME/packages</command>
     </hudson.tasks.Shell>
   </builders>

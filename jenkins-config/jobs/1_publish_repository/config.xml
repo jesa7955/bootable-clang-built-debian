@@ -13,10 +13,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>rm $JENKINS_HOME/packages/linux-image* || true
-rm $JENKINS_HOME/packages/linux-libc-dev* || true
-rm $JENKINS_HOME/packages/linux-headers* || true
-/usr/bin/publish-repository
+      <command>/usr/bin/publish-repository
 </command>
     </hudson.tasks.Shell>
   </builders>
