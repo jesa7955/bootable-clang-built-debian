@@ -10,7 +10,8 @@ sudo apt-get update
 cd $WORKSPACE
 while read PKG
 do
-	NEW_VERSION=`apt-cache showsrc $PKG | awk -F": " '/^Version/ {print $2}' | tail -1`
+	echo $PKG
+	NEW_VERSION=`apt-cache showsrc $PKG | awk -F": " '/^Version/ {print $2}' | tail -1` 
 	if [ -e ${PKG}_version ]
 	then
 		OLD_VERSION=`cat ${PKG}_version`
@@ -35,6 +36,6 @@ then
 else
 	if [ $UPDATE_NUM -gt 0 ]
 	then
-		/usr/bin/jenkins-driver build 1_publish_respository nowait
+		/usr/bin/jenkins-driver build 1_publish_repository nowait
 	fi
 fi

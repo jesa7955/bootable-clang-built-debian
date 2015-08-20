@@ -4,7 +4,7 @@ IMG=$1
 LINUX=`apt-cache search -t sid linux-image | grep "for 64-bit PCs$" | head -n1 | awk -F" - " '{print $1}'` 
 INCLUDE="--include=$LINUX,grub-pc,locales,ifupdown"
 VARIANT="--variant=minbase"
-MIRROR="http://mirrors.163.com/debian" 
+MIRROR="http://http.debian.net/debian" 
 
 sudo qemu-img create -f qcow2 ${IMG}.qcow2 5G
 mkdir $IMG
@@ -16,23 +16,23 @@ sudo mkfs.ext4 /dev/nbd0p1
 sudo mount /dev/nbd0p1 $IMG 
 sudo debootstrap $VARIANT $INCLUDE sid $IMG $MIRROR
 RES=$?
-
 sudo arch-chroot $IMG /bin/bash -x <<'EOF'
 source /etc/profile
 sed -i 's/# en_US.UTF-8/ en_US.UTF-8/g' /etc/locale.gen
 locale-gen 
 echo -e "LANGUAGE=en_US.UTF-8\nLANG=en_US.UTF-8\nLC_ALL=en_US.UTF-8" >> /etc/environment
-KERNEL=`dpkg -l | grep linux-image | awk '/^ii/ {print $2}' | head -1`
 apt-get --yes remove gcc-4.8-base gcc-4.9-base
+echo -e "no\n" | apt-get --yes remove `dpkg -l | grep linux-image | awk '/^ii/ {print $2}' | head -1`
 echo "deb http://128.199.87.18/debian/ clang-built main" > /etc/apt/sources.list
 apt-get update
+ALL_PACKAGE=`dpkg -l | awk '/^ii/ {print $2}' | grep -v "apt\|grub`
+for PKG in $ALL_PACKAGE; do apt-get --yes --force-yes --reinstall install $PKG=`apt-cache showpkg $PKG | grep "^[0-9]" | grep "/var/lib/apt/lists/128.199.87.18_debian_dists_clang-built_main_binary-amd64_Packages" | awk '{print $1}'`; done
 apt-get --yes --force-yes upgrade
 apt-get --yes --force-yes install `apt-cache search linux-image | awk -F" - " '{print $1}'`
-echo -e "no\n" | apt-get --yes remove $KERNEL
+DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes --reinstall install grub-pc=`apt-cache showpkg grub-pc | grep "^[0-9]" | grep "/var/lib/apt/lists/128.199.87.18_debian_dists_clang-built_main_binary-amd64_Packages" | awk '{print $1}'` 
 grub-install /dev/nbd0
 update-grub
 EOF
-
 sudo umount $IMG
 sudo qemu-nbd -d /dev/nbd0
 exit $RES
