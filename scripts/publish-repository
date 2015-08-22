@@ -3,11 +3,9 @@
 PKG_DIR=$JENKINS_HOME/packages
 REPO_DIR=/var/www/debian
 
-cd $PKG_DIR
-ls | sed 's/\.deb//g' | sed 's/\.udeb//g' | awk -F_ '{print $1}' > tmp
-
+ls $PKG_DIR | grep -v "packages\.list\|tmp" | sed 's/\.deb//g' | sed 's/\.udeb//g' | awk -F_ '{print $1}' > $PKG_DIR/tmp
 cd $REPO_DIR
-if [ `/usr/bin/jenkins-driver all-jobs | grep $JOB_NAME | grep -c "nobuilt"` -eq 0 ]
+if [ `/usr/bin/jenkins-driver all-jobs | grep $JOB_NAME | grep -c "nobuilt"` -eq 1 ]
 then
 	ALL=`ls $PKG_DIR | grep -v tmp`
 	for PKG in $ALL
@@ -16,16 +14,19 @@ then
 	done
 else
 	diff -Nru $PKG_DIR/packages.list $PKG_DIR/tmp > $PKG_DIR/list.diff
-	DEL=`cat $PKG_DIR/list.diff | grep "^-" | tail -n +2`
-	ADD=`cat $PKG_DIR/list.diff | grep "^+" | tail -n +2`
-	for PKG in $DEL
-	do
-		sudo reprepro remove clang-built $PKG
-	done
-	for PKG in $ADD
-	do
-		sudo reprepro --ignore=extension includedeb clang-built $PKG_DIR/${PKG}*
-	done
+	if [ -s $PKG_DIR/list.diff ]
+	then
+		DEL=`cat $PKG_DIR/list.diff | grep "^-" | tail -n +2 | sed 's/^-//g'`
+		ADD=`cat $PKG_DIR/list.diff | grep "^+" | tail -n +2 | sed 's/^+//g'`
+		for PKG in $DEL
+		do
+			sudo reprepro remove clang-built $PKG
+		done
+		for PKG in $ADD
+		do
+			sudo reprepro --ignore=extension includedeb clang-built $PKG_DIR/${PKG}*
+		done
+	fi
 fi
 mv $PKG_DIR/tmp $PKG_DIR/packages.list
 rm $PKG_DIR/list.diff || true

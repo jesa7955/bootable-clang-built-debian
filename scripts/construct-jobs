@@ -13,8 +13,8 @@ then
 else
 	if [ -e $PKG_DIFF ]
 	then
-		DEL=`cat $PKG_DIFF | grep "^-" | tail -n +2`
-		ADD=`cat $PKG_DIFF | grep "^+" | tail -n +2`
+		DEL=`cat $PKG_DIFF | grep "^-" | tail -n +2 | sed 's/^-//g'`
+		ADD=`cat $PKG_DIFF | grep "^+" | tail -n +2 | sed 's/^+//g'`
 		for PKG in $DEL
 		do
 			sudo rm -r $JENKINS_HOME/jobs/${PKG}_clang_built

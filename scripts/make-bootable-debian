@@ -25,7 +25,7 @@ apt-get --yes remove gcc-4.8-base gcc-4.9-base
 echo -e "no\n" | apt-get --yes remove `dpkg -l | grep linux-image | awk '/^ii/ {print $2}' | head -1`
 echo "deb http://128.199.87.18/debian/ clang-built main" > /etc/apt/sources.list
 apt-get update
-ALL_PACKAGE=`dpkg -l | awk '/^ii/ {print $2}' | grep -v "apt\|grub`
+ALL_PACKAGE=`dpkg -l | awk '/^ii/ {print $2}' | grep -v "apt\|grub"`
 for PKG in $ALL_PACKAGE; do apt-get --yes --force-yes --reinstall install $PKG=`apt-cache showpkg $PKG | grep "^[0-9]" | grep "/var/lib/apt/lists/128.199.87.18_debian_dists_clang-built_main_binary-amd64_Packages" | awk '{print $1}'`; done
 apt-get --yes --force-yes upgrade
 apt-get --yes --force-yes install `apt-cache search linux-image | awk -F" - " '{print $1}'`
