@@ -20,13 +20,14 @@ make kernel-configure
 cp -r $KERNEL_SRC $WORKSPACE
 cp $CONFIG_DIR/.config $WORKSPACE/linux
 cd $WORKSPACE/linux
-make ARCH=x86_64 -l1 -j2 CONFIG_DEBUG_INFO=1 CONFIG_DEBUG_SECTION_MISMATCH=y CONFIG_NO_ERROR_ON_MISMATCH=y HOSTCC="/var/lib/jenkins/jobs/llvmlinux_clang_built/workspace/llvmlinux/toolchain/clang/head/install/bin/clang" CC="/var/lib/jenkins/jobs/llvmlinux_clang_built/workspace/llvmlinux/toolchain/clang/head/install/bin/clang" deb-pkg
+make ARCH=x86_64 -l1 -j2 CONFIG_DEBUG_INFO=1 CONFIG_DEBUG_SECTION_MISMATCH=y CONFIG_NO_ERROR_ON_MISMATCH=y HOSTCC="$WORKSPACE/llvmlinux/toolchain/clang/head/install/bin/clang" CC="$WORKSPACE/llvmlinux/toolchain/clang/head/install/bin/clang" deb-pkg
 RES=$?
 rm -r $WORKSPACE/linux
-cd $BASE
-make clean-all
+cd $BASE && make clean-all
 if [ $RES -ne 0 ]; then exit 1; fi
+cd $WORKSPACE
+while read PKG; do rm ${PKG}*; done < $PACKAGE_LIST
 cd $REPO_DIR
 sudo reprepro remove clang-built `cat $PACKAGE_LIST`
 sudo reprepro includedeb clang-built $WORKSPACE/*deb
-ls $WORKSPACE/*deb > $PACKAGE_LIST
+ls $WORKSPACE | grep deb > $PACKAGE_LIST

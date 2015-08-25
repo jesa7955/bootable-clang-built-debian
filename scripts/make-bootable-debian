@@ -5,6 +5,7 @@ LINUX=`apt-cache search -t sid linux-image | grep "for 64-bit PCs$" | head -n1 |
 INCLUDE="--include=$LINUX,grub-pc,locales,ifupdown"
 VARIANT="--variant=minbase"
 MIRROR="http://http.debian.net/debian" 
+HOSTNAME="clang-built"
 
 sudo qemu-img create -f qcow2 ${IMG}.qcow2 5G
 mkdir $IMG
@@ -12,11 +13,29 @@ sudo modprobe nbd max_part=16
 sudo qemu-nbd -c /dev/nbd0 ${IMG}.qcow2
 sudo partprobe /dev/nbd0
 echo -e "o\nn\n\n\n\n\na\nw\n" | sudo fdisk /dev/nbd0
-sudo mkfs.ext4 /dev/nbd0p1
+sudo mkfs.ext4 -q /dev/nbd0p1
 sudo mount /dev/nbd0p1 $IMG 
 sudo debootstrap $VARIANT $INCLUDE sid $IMG $MIRROR
-RES=$?
-sudo arch-chroot $IMG /bin/bash -x <<'EOF'
+if [ $? -ne 0 ]; then exit 1; fi
+cat <<EOF > $IMG/etc/fstab
+/dev/sda1 /                   ext4    errors=remount-ro 0       1
+EOF
+echo $HOSTNAME > $IMG/etc/hostname
+cat <<EOF > $IMG/etc/hosts
+127.0.0.1       localhost
+127.0.1.1 		$HOSTNAME
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+EOF
+cat <<EOF > $IMG/etc/network/interfaces
+auto lo
+iface lo inet loopback
+auto enp0s3
+iface enp0s3 inet dhcp
+EOF
+sudo LC_ALL=C arch-chroot $IMG /bin/bash -x <<'EOF'
 source /etc/profile
 sed -i 's/# en_US.UTF-8/ en_US.UTF-8/g' /etc/locale.gen
 locale-gen 
@@ -32,7 +51,8 @@ apt-get --yes --force-yes install `apt-cache search linux-image | awk -F" - " '{
 DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes --reinstall install grub-pc=`apt-cache showpkg grub-pc | grep "^[0-9]" | grep "/var/lib/apt/lists/128.199.87.18_debian_dists_clang-built_main_binary-amd64_Packages" | awk '{print $1}'` 
 grub-install /dev/nbd0
 update-grub
+echo -e "root\nroot\n" | passwd
 EOF
+sed -i "s|/dev/nbd0p1|/dev/sda1|g" $IMG/boot/grub/grub.cfg
 sudo umount $IMG
 sudo qemu-nbd -d /dev/nbd0
-exit $RES
