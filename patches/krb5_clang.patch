@@ -1,0 +1,23 @@
+diff -Nru krb5-1.13.2+dfsg/debian/patches/clang_build.patch krb5-1.13.2+dfsg/debian/patches/clang_build.patch
+--- krb5-1.13.2+dfsg/debian/patches/clang_build.patch	1970-01-01 00:00:00.000000000 +0000
++++ krb5-1.13.2+dfsg/debian/patches/clang_build.patch	2015-08-27 05:27:55.000000000 +0000
+@@ -0,0 +1,11 @@
++--- a/src/lib/krb5/ccache/cc_kcm.c
+++++ b/src/lib/krb5/ccache/cc_kcm.c
++@@ -377,7 +377,7 @@
++ kcmio_call(krb5_context context, struct kcmio *io, struct kcmreq *req)
++ {
++     krb5_error_code ret;
++-    size_t reply_len;
+++    size_t reply_len = 0; // make clang happy
++ 
++     if (k5_buf_status(&req->reqbuf) != 0)
++         return ENOMEM;
+diff -Nru krb5-1.13.2+dfsg/debian/patches/series krb5-1.13.2+dfsg/debian/patches/series
+--- krb5-1.13.2+dfsg/debian/patches/series	2015-06-25 20:41:35.000000000 +0000
++++ krb5-1.13.2+dfsg/debian/patches/series	2015-08-27 05:26:38.000000000 +0000
+@@ -8,3 +8,4 @@
+ debian-local/0008-Fix-pkg-config-library-include-paths.patch
+ debian-local/0009-Use-isystem-for-include-paths.patch
+ debian-local/0010-Fix-krb5-config-paths.patch
++clang_build.patch
