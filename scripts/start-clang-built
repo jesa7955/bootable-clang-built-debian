@@ -1,16 +1,20 @@
 #!/bin/bash
 
-REPO=$JENKINS_HOME/bootable-clang-built-debian
+GIT_REPO=$JENKINS_HOME/bootable-clang-built-debian
 PKG_LIST=$JENKINS_HOME/userContent/package.list
-UPDATE_NUM=0
+REPO_DIR=/var/www/debian
 
-cd $REPO
+cd $GIT_REPO
 git pull
 sudo apt-get update
-cd $WORKSPACE
+sudo pbuilder --update --basetgz /var/cache/pbuilder/base-sid-clang-amd64.tgz
+sudo pbuilder --update --basetgz /var/cache/pbuilder/base-sid-normal-amd64.tgz
 while read PKG
 do
+	cd $WORKSPACE
 	echo $PKG
+	BIN_LIST=$WORKSPACE/${PKG}_binaries.list
+	PKG_WORKSPACE=$JENKINS_HOME/jobs/${PKG}_clang_built/workspace
 	NEW_VERSION=`apt-cache showsrc $PKG | awk -F": " '/^Version/ {print $2}' | tail -1` 
 	if [ -e ${PKG}_version ]
 	then
@@ -22,11 +26,16 @@ do
 	if [ $NEW_VERSION != $OLD_VERSION ] || [ $LAST_RESULT -ne 1 ]
 	then
 		echo $NEW_VERSION > ${PKG}_version
-		UPDATE_NUM=`expr $NUM + 1`
 		/usr/bin/jenkins-driver build ${PKG}_clang_built wait
+		LAST_RESULT=`/usr/bin/jenkins-driver last-result ${PKG}_clang_built | grep -c SUCCESS`
+		if [ $LAST_RESULT -eq 1 ]
+		then
+			cd $REPO_DIR && sudo reprepro remove clang-built `cat $BIN_LIST`
+			sudo reprepro --ignore=extension includedeb clang-built $PKG_WORKSPACE/*deb
+			ls $PKG_WORKSPACE | grep "deb$" | sed 's/\.deb//g' | sed 's/\.udeb//g' | awk -F_ '{print $1}' > $BIN_LIST
+		fi
 	fi
 done < $PKG_LIST
-
 /usr/bin/jenkins-driver build llvmlinux wait
 JOBS=`/usr/bin/jenkins-driver all-jobs | grep -v start_clang_built | grep -c clang_built`
 SUCCEEDED=`/usr/bin/jenkins-driver all-jobs | grep -v start_clang_built | grep clang_built | grep -c blue`
@@ -34,8 +43,5 @@ if [ $JOBS -ne $SUCCEEDED ]
 then
 	exit 1
 else
-	if [ $UPDATE_NUM -gt 0 ]
-	then
-		/usr/bin/jenkins-driver build 1_publish_repository nowait
-	fi
+	exit 0
 fi

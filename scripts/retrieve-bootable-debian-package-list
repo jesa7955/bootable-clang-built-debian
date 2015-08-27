@@ -1,7 +1,7 @@
 #!/bin/bash
 
-LINUX=`apt-cache search -t sid linux-image | grep "for 64-bit PCs$" | head -n1 | awk -F" - " '{print $1}'` 
-INCLUDE="--include=$LINUX,grub-pc,locales,ifupdown"
+LINUX=`apt-cache search -t sid linux-image | grep "for 64-bit PCs$" | tail -1 | awk -F" - " '{print $1}'` 
+INCLUDE="--include=$LINUX,grub-pc,locales,ifupdown,isc-dhcp-client,openssh-server"
 VARIANT="--variant=minbase"
 BIN=`sudo debootstrap --print-debs $INCLUDE $VARIANT sid test` 
 for PKG in $BIN

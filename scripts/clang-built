@@ -1,9 +1,8 @@
 #!/bin/bash
 
-REPO=$JENKINS_HOME/bootable-clang-built-debian
-PATCHES=$REPO/patches
+GIT_REPO=$JENKINS_HOME/bootable-clang-built-debian
+PATCHES=$GIT_REPO/patches
 
-rm $JENKINS_HOME/packages/*${1}*
 mkdir $1
 cd $1
 apt-get source $1
@@ -31,4 +30,20 @@ else
 fi
 RES=$?
 sudo rm -r $WORKSPACE/$1
+if [ $1 = "gcc-5" ]
+then
+	cd $WORKSPACE
+	/usr/bin/gcc-built-download gcc-5-base
+	/usr/bin/gcc-built-download libgcc1
+	/usr/bin/gcc-built-download libstdc++6
+	exit 0
+elif [ $1 = "glibc" ]
+then 
+	cd $WORKSPACE
+	/usr/bin/gcc-built-download libc-bin
+	/usr/bin/gcc-built-download libc6
+	/usr/bin/gcc-built-download locales
+	/usr/bin/gcc-built-download multiarch-support 
+	exit 0
+fi
 exit $RES
