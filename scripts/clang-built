@@ -2,6 +2,8 @@
 
 GIT_REPO=$JENKINS_HOME/bootable-clang-built-debian
 PATCHES=$GIT_REPO/patches
+HOOK_CLANG=$JENKINS_HOME/bootable-clang-built-debian/scripts/hooks/hook-clang
+HOOK_NORMAL=$JENKINS_HOME/bootable-clang-built-debian/scripts/hooks/hook-normal
 
 mkdir $1
 cd $1
@@ -16,28 +18,28 @@ then
 	cd `ls -l | grep ^d | head -n1 | awk '{print $9}'`
 	if [ $2 = "special" ]
 	then 
-		sudo pdebuild --buildresult $WORKSPACE --use-pdebuild-internal -- --basetgz /var/cache/pbuilder/base-sid-normal-amd64.tgz
-	else
-		sudo pdebuild --buildresult $WORKSPACE --use-pdebuild-internal -- --basetgz /var/cache/pbuilder/base-sid-clang-amd64.tgz
+		sudo pdebuild --buildresult $WORKSPACE --use-pdebuild-internal -- --basetgz /var/cache/pbuilder/base-sid-normal-amd64.tgz --hookdir $HOOK_NORMAL
+	else                                                                                                                                                    
+		sudo pdebuild --buildresult $WORKSPACE --use-pdebuild-internal -- --basetgz /var/cache/pbuilder/base-sid-clang-amd64.tgz --hookdir $HOOK_CLANG 
 	fi
 else
 	if [ $2 = "special" ]
 	then
-		sudo pbuilder --build  --buildresult $WORKSPACE --basetgz /var/cache/pbuilder/base-sid-normal-amd64.tgz *dsc
+		sudo pbuilder --build  --buildresult $WORKSPACE --basetgz /var/cache/pbuilder/base-sid-normal-amd64.tgz --hookdir $HOOK_NORMAL *dsc
 	else
-		sudo pbuilder --build  --buildresult $WORKSPACE --basetgz /var/cache/pbuilder/base-sid-clang-amd64.tgz *dsc
+		sudo pbuilder --build  --buildresult $WORKSPACE --basetgz /var/cache/pbuilder/base-sid-clang-amd64.tgz --hookdir $HOOK_CLANG *dsc
 	fi
 fi
 RES=$?
 sudo rm -r $WORKSPACE/$1
-if [ $1 = "gcc-5" ]
+if [ $1 = "gcc-5" ] && [ $RES -ne 0 ]
 then
 	cd $WORKSPACE
 	/usr/bin/gcc-built-download gcc-5-base
 	/usr/bin/gcc-built-download libgcc1
 	/usr/bin/gcc-built-download libstdc++6
 	exit 0
-elif [ $1 = "glibc" ]
+elif [ $1 = "glibc" ] && [ $RES -ne 0 ]
 then 
 	cd $WORKSPACE
 	/usr/bin/gcc-built-download libc-bin

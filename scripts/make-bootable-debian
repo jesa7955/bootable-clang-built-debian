@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IMG=$1
-LINUX=`apt-cache search -t sid linux-image | grep "for 64-bit PCs$" | tail -1 | awk -F" - " '{print $1}'` 
+LINUX=`apt-cache search -t sid linux-image | grep "for 64-bit PCs$" | head -1 | awk -F" - " '{print $1}'` 
 INCLUDE="--include=$LINUX,grub-pc,locales,ifupdown,isc-dhcp-client,openssh-server"
 VARIANT="--variant=minbase"
 MIRROR="http://http.debian.net/debian" 
@@ -17,7 +17,7 @@ echo -e "o\nn\n\n\n\n\na\nw\n" | sudo fdisk /dev/nbd0
 sudo mkfs.ext4 -q /dev/nbd0p1
 sudo mount /dev/nbd0p1 $IMG 
 sudo debootstrap $VARIANT $INCLUDE sid $IMG $MIRROR
-if [ $? -ne 0 ]; then exit 1; fi
+if [ $? -ne 0 ]; then exit 1; sudo umount $IMG; sudo qemu-nbd -d /dev/nbd0; fi
 
 # make some configuration
 cat <<EOF > $IMG/etc/fstab
@@ -48,7 +48,7 @@ apt-get --yes remove gcc-4.8-base gcc-4.9-base
 echo -e "no\n" | apt-get --yes remove `dpkg -l | grep linux-image | awk '/^ii/ {print $2}' | head -1`
 echo "deb http://128.199.87.18/debian/ clang-built main" > /etc/apt/sources.list
 apt-get update
-ALL_PACKAGE=`dpkg -l | awk '/^ii/ {print $2}' | grep -v "apt\|grub"`
+ALL_PACKAGE=`dpkg -l | awk '/^ii/ {print $2}' | grep -v "apt\|grub\|gcc"`
 for PKG in $ALL_PACKAGE; do apt-get --yes --force-yes --reinstall install $PKG=`apt-cache showpkg $PKG | grep "^[0-9]" | grep "/var/lib/apt/lists/128.199.87.18_debian_dists_clang-built_main_binary-amd64_Packages" | awk '{print $1}'`; done
 apt-get --yes --force-yes upgrade
 apt-get --yes --force-yes install `apt-cache search linux-image | awk -F" - " '{print $1}'`
@@ -57,17 +57,18 @@ grub-install /dev/nbd0
 update-grub
 echo -e "root\nroot\n" | passwd
 systemctl enable ssh
-useradd -m -s /bin/bash test
-echo -e "test\ntest\n" | passwd test
+useradd -m -s /bin/bash user
+echo -e "user\nuser\n" | passwd user
 EOF
 sed -i "s|/dev/nbd0p1|/dev/sda1|g" $IMG/boot/grub/grub.cfg
 sudo umount $IMG
 
 # test bootablity with ssh
 sudo qemu-nbd -d /dev/nbd0
-qemu-system-x86_64 -m 128 -hda bootable.qcow2 -nographic -redir tcp:8964::22 -enable-kvm < /dev/null &
+qemu-system-x86_64 -m 128 -hda bootable.qcow2 -nographic -net user,hostfwd=tcp::8964-:22 -net nic -enable-kvm < /dev/null &
+sudo ssh-keygen -f "/root/.ssh/known_hosts" -R [localhost]:8964
 sleep 30
-sshpass -p "test" ssh -o StrictHostKeyChecking=no -p 8964 test@localhost << EOF
+sshpass -p "user" ssh -o StrictHostKeyChecking=no -p 8964 user@localhost << EOF
 logout
 EOF
 RES=$?

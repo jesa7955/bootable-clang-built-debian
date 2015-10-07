@@ -1,0 +1,4 @@
+#!/bin/bash
+
+gcc --version | grep -i gcc
+if [ $? -eq 1 ]; then exit 0; else echo "Not using clang" && exit 1; fi

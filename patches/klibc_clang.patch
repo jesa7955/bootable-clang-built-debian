@@ -20,8 +20,8 @@ diff -Nru klibc-2.0.4/debian/patches/clang_build.patch klibc-2.0.4/debian/patche
 diff -Nru klibc-2.0.4/debian/patches/series klibc-2.0.4/debian/patches/series
 --- klibc-2.0.4/debian/patches/series	2014-10-05 00:13:46.000000000 +0000
 +++ klibc-2.0.4/debian/patches/series	2015-06-21 05:38:47.000000000 +0000
-@@ -9,3 +9,4 @@
- readlink-add-f-option.patch
- mount-implement-o-defaults.patch
- mips-update-archfcntl-h.patch
+@@ -18,3 +18,4 @@
+ klibc-ppc64-fix-struct-stat.patch
+ gzip-fix-silent-fallback-to-decompression.patch
+ klibc-mips-setjmp-s-don-t-save-and-restore-floating-point.patch
 +clang_build.patch

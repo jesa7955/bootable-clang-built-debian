@@ -1,0 +1,8 @@
+#!/bin/bash
+
+CLANG_VERSION=3.6
+
+apt-get --yes install clang-$CLANG_VERSION
+ln -s /usr/bin/clang-$CLANG_VERSION /usr/bin/clang
+ln -s /usr/bin/clang++-$CLANG_VERSION /usr/bin/clang++
+

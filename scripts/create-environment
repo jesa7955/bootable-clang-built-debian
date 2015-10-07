@@ -1,0 +1,16 @@
+#!/bin/bash
+
+HOOK_CLANG=$JENKINS_HOME/bootable-clang-built-debian/scripts/hooks/hook-clang
+HOOK_NORMAL=$JENKINS_HOME/bootable-clang-built-debian/scripts/hooks/hook-normal
+PBUILDER() {
+	sudo pbuilder --create --basetgz ./${1} --debootstrapopts --variant=buildd --hookdir ${2} --mirror http://http.debian.net/debian
+	if [ $? -eq 0 ]
+	then
+		sudo mv ./${1} /var/cache/pbuilder/${1}
+	else
+		if [ $RES -ne 1 ]; then RES=1; fi
+	fi
+}
+
+PBUILDER "base-sid-clang-amd64.tgz" $HOOK_CLANG
+PBUILDER "base-sid-normal-amd64.tgz" $HOOK_NORMAL

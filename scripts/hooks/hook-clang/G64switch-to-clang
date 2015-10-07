@@ -1,0 +1,40 @@
+#!/bin/bash 
+CLANG_VERSION=3.6
+
+echo "Install of clang"
+apt-get update
+apt-get install --yes --no-install-recommends clang-$CLANG_VERSION -t unstable
+
+echo "Replace gcc, g++ & cpp by clang"
+cd /usr/bin
+VERSIONS="5 4.9 4.8 4.7 4.6"
+for VERSION in $VERSIONS
+do
+	apt-get install --yes --no-install-recommends gcc-$VERSION gcc-$VERSION-multilib -t unstable
+	rm g++-$VERSION gcc-$VERSION cpp-$VERSION
+	ln -s clang++-$CLANG_VERSION g++-$VERSION
+	ln -s clang-$CLANG_VERSION gcc-$VERSION
+	ln -s clang-$CLANG_VERSION cpp-$VERSION
+done
+ln -s clang-$CLANG_VERSION clang
+ln -s clang++-$CLANG_VERSION clang++
+
+echo "Block the installation of new gcc version"
+echo "gcc-4.6 hold"|dpkg --set-selections
+echo "cpp-4.6 hold"|dpkg --set-selections
+echo "g++-4.6 hold"|dpkg --set-selections
+echo "gcc-4.7 hold"|dpkg --set-selections
+echo "cpp-4.7 hold"|dpkg --set-selections
+echo "g++-4.7 hold"|dpkg --set-selections
+echo "gcc-4.8 hold"|dpkg --set-selections
+echo "gcc-4.8 hold"|dpkg --set-selections
+echo "cpp-4.8 hold"|dpkg --set-selections
+echo "g++-4.9 hold"|dpkg --set-selections
+echo "cpp-4.9 hold"|dpkg --set-selections
+echo "g++-4.9 hold"|dpkg --set-selections
+echo "g++-5 hold"|dpkg --set-selections
+echo "cpp-5 hold"|dpkg --set-selections
+echo "g++-5 hold"|dpkg --set-selections
+
+echo "Check if gcc, g++ & cpp are actually clang"
+gcc --version|grep clang > /dev/null || exit 1
